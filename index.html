@@ -1,286 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Learn About Moon Phases</title>
-    <!-- Import a Google Font for a modern look -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phases of the Moon</title>
     <style>
-      /* Global Styles */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Roboto', sans-serif;
-        background: linear-gradient(135deg, #2c3e50, #4ca1af);
-        color: #333;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-      }
-      h1 {
-        margin: 20px 0;
-        font-size: 2.5em;
-        color: #fff;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-      }
-      .container {
-        width: 90%;
-        max-width: 1000px;
-        margin: 20px auto;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-      }
-      .moon-animation-container,
-      .quiz-container {
-        background: #fff;
-        border-radius: 12px;
-        padding: 20px;
-        margin: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        flex: 1 1 400px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      /* Moon Animation Styles */
-      .moon-container {
-        margin: 20px;
-      }
-      svg {
-        border: 2px solid #ddd;
-        background: radial-gradient(circle at 50% 50%, #555, #222);
-        border-radius: 50%;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s;
-      }
-      svg:hover {
-        transform: scale(1.05);
-      }
-      .controls {
-        margin: 10px;
-        display: flex;
-        gap: 10px;
-      }
-      button {
-        padding: 10px 16px;
-        font-size: 1rem;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background 0.3s, transform 0.2s;
-      }
-      button:hover {
-        transform: translateY(-2px);
-      }
-      .btn-primary {
-        background: #4ca1af;
-        color: #fff;
-      }
-      .btn-secondary {
-        background: #e67e22;
-        color: #fff;
-      }
-      /* Quiz Styles */
-      .quiz {
-        width: 100%;
-        padding: 20px;
-      }
-      .quiz h2 {
-        margin-bottom: 15px;
-      }
-      .quiz-options {
-        list-style: none;
-        padding: 0;
-      }
-      .quiz-options li {
-        margin-bottom: 10px;
-      }
-      .quiz-options label {
-        cursor: pointer;
-      }
-      .feedback {
-        font-weight: 700;
-        margin-top: 10px;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1em;
+            width: 100%;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .moon-phase {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        .moon-phase svg {
+            width: 100px;
+            height: 100px;
+        }
+        .quiz-container {
+            margin-top: 20px;
+        }
+        .quiz-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .quiz-container label {
+            margin-top: 10px;
+        }
+        .quiz-container input[type="submit"] {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .quiz-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
     </style>
-  </head>
-  <body>
-    <h1>Learn About Moon Phases</h1>
+</head>
+<body>
+    <header>
+        <h1>Phases of the Moon</h1>
+    </header>
     <div class="container">
-      <div class="moon-animation-container" id="moon-root"></div>
-      <div class="quiz-container" id="quiz-root"></div>
-    </div>
-
-    <!-- Load React and Babel from CDNs -->
-    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-
-    <!-- React Code -->
-    <script type="text/babel">
-      const { useState, useEffect } = React;
-
-      // The Moon component draws an SVG moon using a mask.
-      // A gold circle represents the moon. A black circle in the mask hides part of it.
-      function Moon({ offset, label }) {
-        return (
-          <div className="moon-container">
-            <h2>{label}</h2>
-            <svg width="200" height="200">
-              <defs>
-                <mask id="moonMask">
-                  {/* White reveals the moon */}
-                  <rect x="0" y="0" width="200" height="200" fill="white" />
-                  {/* The black circle masks part of the moon */}
-                  <circle cx={100 + offset} cy="100" r="50" fill="black" />
-                </mask>
-              </defs>
-              {/* The moon itself */}
-              <circle cx="100" cy="100" r="50" fill="gold" mask="url(#moonMask)" />
-              <circle cx="100" cy="100" r="50" fill="none" stroke="#ccc" strokeWidth="2" />
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
             </svg>
-          </div>
-        );
-      }
-
-      // Define the phases with labels and offset values.
-      const phases = [
-        { label: "New Moon", offset: 0 },
-        { label: "Waxing Crescent", offset: 25 },
-        { label: "First Quarter", offset: 50 },
-        { label: "Waxing Gibbous", offset: 75 },
-        { label: "Full Moon", offset: 100 },
-        { label: "Waning Gibbous", offset: -75 },
-        { label: "Last Quarter", offset: -50 },
-        { label: "Waning Crescent", offset: -25 }
-      ];
-
-      // The MoonAnimation component cycles through the moon phases.
-      function MoonAnimation() {
-        const [currentPhase, setCurrentPhase] = useState(0);
-        const [isPlaying, setIsPlaying] = useState(false);
-
-        useEffect(() => {
-          let interval = null;
-          if (isPlaying) {
-            interval = setInterval(() => {
-              setCurrentPhase(prev => (prev + 1) % phases.length);
-            }, 2000);
-          }
-          return () => clearInterval(interval);
-        }, [isPlaying]);
-
-        const nextPhase = () => {
-          setCurrentPhase((prev) => (prev + 1) % phases.length);
-        };
-
-        return (
-          <div>
-            <Moon offset={phases[currentPhase].offset} label={phases[currentPhase].label} />
-            <div className="controls">
-              <button className="btn-primary" onClick={nextPhase}>Next Phase</button>
-              <button className="btn-secondary" onClick={() => setIsPlaying(!isPlaying)}>
-                {isPlaying ? "Pause" : "Play"}
-              </button>
-            </div>
-          </div>
-        );
-      }
-
-      // The Quiz component presents multiple-choice questions about moon phases.
-      function Quiz() {
-        const quizQuestions = [
-          {
-            question: "What phase comes immediately after Waxing Crescent?",
-            options: [
-              "First Quarter",
-              "New Moon",
-              "Full Moon",
-              "Waning Crescent"
-            ],
-            answer: "First Quarter"
-          },
-          {
-            question: "Which phase is known as the phase where the moon is fully illuminated?",
-            options: [
-              "First Quarter",
-              "Full Moon",
-              "Waning Gibbous",
-              "Waxing Crescent"
-            ],
-            answer: "Full Moon"
-          },
-          {
-            question: "What phase comes immediately before Full Moon?",
-            options: [
-              "Waxing Gibbous",
-              "Waning Crescent",
-              "First Quarter",
-              "New Moon"
-            ],
-            answer: "Waxing Gibbous"
-          }
-        ];
-
-        const [currentQuestion, setCurrentQuestion] = useState(0);
-        const [selectedOption, setSelectedOption] = useState("");
-        const [feedback, setFeedback] = useState("");
-
-        const handleOptionChange = (e) => {
-          setSelectedOption(e.target.value);
-        };
-
-        const handleSubmit = (e) => {
-          e.preventDefault();
-          if (selectedOption === quizQuestions[currentQuestion].answer) {
-            setFeedback("Correct!");
-          } else {
-            setFeedback("Incorrect! The correct answer is: " + quizQuestions[currentQuestion].answer);
-          }
-        };
-
-        const nextQuestion = () => {
-          setFeedback("");
-          setSelectedOption("");
-          setCurrentQuestion((prev) => (prev + 1) % quizQuestions.length);
-        };
-
-        return (
-          <div className="quiz">
-            <h2>Quiz</h2>
-            <p>{quizQuestions[currentQuestion].question}</p>
-            <form onSubmit={handleSubmit}>
-              <ul className="quiz-options">
-                {quizQuestions[currentQuestion].options.map((option, index) => (
-                  <li key={index}>
-                    <label>
-                      <input
-                        type="radio"
-                        name="option"
-                        value={option}
-                        checked={selectedOption === option}
-                        onChange={handleOptionChange}
-                      />
-                      {option}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-              <button className="btn-primary" type="submit">Submit Answer</button>
-            </form>
-            {feedback && <p className="feedback">{feedback}</p>}
-            <button className="btn-secondary" onClick={nextQuestion}>Next Question</button>
-          </div>
-        );
-      }
-
-      // Render the MoonAnimation and Quiz components into separate containers.
-      ReactDOM.render(<MoonAnimation />, document.getElementById("moon-root"));
-      ReactDOM.render(<Quiz />, document.getElementById("quiz-root"));
-    </script>
-  </body>
+            <p>New Moon</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+                <path d="M 50 10 A 40 40 0 0 0 50 90 A 40 40 0 0 1 50 10" fill="gray" />
+            </svg>
+            <p>Waxing Crescent</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+                <circle cx="50" cy="50" r="40" fill="gray" />
+            </svg>
+            <p>First Quarter</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+                <path d="M 10 50 A 40 40 0 0 1 90 50 A 40 40 0 0 0 10 50" fill="gray" />
+            </svg>
+            <p>Waxing Gibbous</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="gray" />
+            </svg>
+            <p>Full Moon</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+                <path d="M 10 50 A 40 40 0 0 0 90 50 A 40 40 0 0 1 10 50" fill="gray" />
+            </svg>
+            <p>Waning Gibbous</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+                <path d="M 50 10 A 40 40 0 0 1 50 90 A 40 40 0 0 0 50 10" fill="gray" />
+            </svg>
+            <p>Last Quarter</p>
+        </div>
+        <div class="moon-phase">
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="white" />
+                <path d="M 50 10 A 40 40 0 0 1 50 90 A 40 40 0 0 0 50 10" fill="gray" />
+            </svg>
+            <p>Waning Crescent</p>
+        </div>
+    </div>
+    <div class="quiz-container">
+        <form id="quiz-form">
+            <label>
+                <input type="radio" name="q1" value="a"> New Moon
+            </label>
+            <label>
+                <input type="radio" name="q1" value="b"> Waxing Crescent
+            </label>
+            <label>
+                <input type="radio" name="q1" value="c"> First Quarter
+            </label>
+            <label>
+                <input type="radio" name="q1" value="d"> Waxing Gibbous
+            </label>
+            <label>
+                <input type="radio" name="q1" value="e"> Full Moon
+            </label>
+            <label>
+                <input type="radio" name="q1" value="f"> Waning Gibbous
+            </label>
+            <label>
+                <input type="radio" name="q1" value="g"> Last Quarter
+            </label>
+            <label>
+                <input type="radio" name="q1" value="h"> Waning Crescent
+            </label>
+            <input type="submit" value="Submit">
+        </form>
+        <div class="score" id="score">Score: 0</div>
+    </div>
+    <script src="script.js"></script>
+</body>
 </html>
